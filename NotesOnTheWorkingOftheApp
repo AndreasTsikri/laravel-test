@@ -1,0 +1,19 @@
+these commands have to be run inside the container so the host can see them in order for the app to run ok!! :
+
+sudo chown -R $USER:www-data storage
+
+sudo chown -R $USER:www-data bootstrap/cache
+
+sudo chmod -R 775 storage
+
+sudo chmod -R 775 bootstrap/cache
+
+
+
+then we must make sure that .env contains the correct database.
+then run in php-cli container (in which we have artisan!) php artisan config:cache 
+
+then if tables like session does not exist run migrations as :
+php artisan session:table
+php artisan migrate
+
