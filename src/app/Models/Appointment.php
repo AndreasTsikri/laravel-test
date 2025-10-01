@@ -14,13 +14,18 @@ class Appointment extends Model
     public static DateTime $endDateTime = new DateTime('18:00:00');
     public static $slots = [];
 
-    private function createSlots()
+    private function createSlots(int $stepInMinutes)
     {
-	    $start = 
-	    while(self::)
+	    $dt = self::$startDatetime; 
+	    while($dt <= self::$endDatetime){
+
+	    $mins = new DateInterval("PT{$stepInMinutes}M")
+	    $dt->add(mins);
+
+	    }
     }
 
-    private function createSlots(DateTime $time, int $stepInMinutes) : DateTime
+    private function addSlot(DateTime $time, int $stepInMinutes) : DateTime
     {
 	    $mins = new DateInterval("PT{$stepInMinutes}M")
 	    return $time->add(mins);
