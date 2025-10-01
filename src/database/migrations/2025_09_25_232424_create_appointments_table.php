@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('booked_at');
+            $table->foreignId('service_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('specialist_id')->constrained()->cascadeOnDelete();
+            $table->string('client_name')->;
+            $table->dateTime('start_datetime');
+            $table->dateTime('end_datetime');
+	    $table->index(['specialist_id','start_datetime']);
             $table->timestamps();
         });
     }
