@@ -1,0 +1,5 @@
+ls
+class_exists(App\Http\Controllers\SlotsController::class);
+exit
+App\Models\Specialist::All()
+exit

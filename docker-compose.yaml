@@ -2,6 +2,7 @@ version: "3.9"
 services:
   php-fpm:
     build: ./php-fpm
+    user: "1000:1000"
     volumes:
       - ./src:/var/www/html
     depends_on:
@@ -9,10 +10,12 @@ services:
 
   php-cli:
     build: ./php-cli
+    user: "1000:1000"
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
-
+    environment:
+      - XDG_CONFIG_HOME=/var/www/html/.config
   nginx:
     image: nginx:alpine
     volumes:

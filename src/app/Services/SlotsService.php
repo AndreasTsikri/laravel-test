@@ -1,8 +1,9 @@
 <?php
-namespace app\Servcises;
-use app\Models\Specialist;
-use app\Models\Appointment;
+namespace App\Services;
 
+use App\Models\Specialist;
+use App\Models\Appointment;
+use Carbon\Carbon;
 class SlotsService{
 	//protected $specialistId;
 	//public __construct($specialistId){
@@ -11,9 +12,9 @@ class SlotsService{
 
 	public function getAvailableSlots($specialistId,$date,$slotsDuration) : ?array{
 
-		if(!Specialists::where('specialist_id',$specialistId)->exists())
+		if(!Specialist::where('id',$specialistId)->exists())
 			return null;
-		return getAvSlots($specialistId,$date,$slotsDuration);
+		return $this->getAvSlots($specialistId,$date,$slotsDuration);
 }
 
 	public function getAvSlots($specialistId,$date,$serviceDuration) : array
@@ -29,7 +30,7 @@ class SlotsService{
 		$startWorkDt = Carbon::parse($date . '09:00:00');
 		$endWorkDt   = Carbon::parse($date . '18:00:00');
 		//Get Specialist appointments
-		$appointments = Appointments::where('specialist_id',$specialistId)
+		$appointments = Appointment::where('specialist_id',$specialistId)
 			//->whereDate('start_datetime',$date)
 			->orderBy('start_datetime')
 			->get();
@@ -44,8 +45,6 @@ class SlotsService{
 			$isAvailable = true;
 			foreach($appointments as $ap)
 				$isAvailable = !$areOverlap($slot,$endSlot,$ap->start_datetime,$ap->end_datetime);
-
-
 
 			if($isAvailable)
 				$availableSlots[] = $slot->format('H:i');
