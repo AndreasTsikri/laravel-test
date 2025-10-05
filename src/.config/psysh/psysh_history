@@ -3,3 +3,17 @@ class_exists(App\Http\Controllers\SlotsController::class);
 exit
 App\Models\Specialist::All()
 exit
+phpversion()
+help
+help phpversion
+help phpversion()
+help migrate
+show phpversion
+exit
+doc phpversion
+history
+doc phpversion
+exit
+App\Models\Service::All()
+:1
+q

@@ -21,21 +21,29 @@ class SlotsController extends Controller
 		$validated = $request->validate(
 			[
 				'specialistId'=> 'required|string|exists:specialists,id',
+				'service'=> 'required|string|exists:services,name',
 				//'service_id'=>'required|integer|exists:specialists,id',
 				'date'=>'nullable|date|date_format:Y-m-d'
 			]);
 
 
 //		$avSlots = $slotsService->getAvailableSlots($specialistId,'1/10/2025',5);
-		$avSlots = $this->slotsService->getAvailableSlots(
+		//$avSlots = $this->slotsService->getAvailableSlots(
+		//	$validated['specialistId'],
+		//	$validated['date'] ?? "2025-10-10",
+		//	5);
+		$avSlots = $this->slotsService->getAvailableSlots_2(
 			$validated['specialistId'],
 			$validated['date'] ?? "2025-10-10",
-			5);
+			$validated['service'],
+			);
 		$resp = $avSlots == null ? 
 			response()->json([
 				'message'=> "Specialist does not eist"],404): response()->json([
-			'message'=> 'Booked OK!',
-			'av slots' => $avSlots
+				'message'=> 'Booked OK!',
+				'specialist id'=> $validated['specialistId'],
+				'service'=> $validated['service'],
+				'av slots' => $avSlots
 				],201);
 		return $resp;
 	}

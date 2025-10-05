@@ -15,7 +15,20 @@ class SlotsService{
 		if(!Specialist::where('id',$specialistId)->exists())
 			return null;
 		return $this->getAvSlots($specialistId,$date,$slotsDuration);
-}
+	}
+	public function getAvailableSlots_2($specialistId,$date,$serviceName) : ?array{
+
+		$spec = Specialist::where('id',$specialistId)
+			->whereHas('services', function($q) use ($serviceName){
+				$q->where('name',$serviceName);
+			})
+			->with('services')
+			->first();
+
+		if($spec == null) return null;
+
+		return $this->getAvSlots($specialistId,$date,$spec->services->first()->duration);
+	}
 
 	public function getAvSlots($specialistId,$date,$serviceDuration) : array
 	{
@@ -40,6 +53,7 @@ class SlotsService{
 		$slot = $startWorkDt->copy();
 		$endSlot = $startWorkDt->copy()->addMinutes($serviceDuration);
 		$availableSlots = [];
+		$slotDiscreteTime = 5;//the disretization of the slots -> we seperate in 5 mins slots!
 		while($endSlot <= $endWorkDt)
 		{
 			$isAvailable = true;
@@ -49,8 +63,8 @@ class SlotsService{
 			if($isAvailable)
 				$availableSlots[] = $slot->format('H:i');
 
-			$slot->addMinutes($serviceDuration);
-			$endSlot->addMinutes($serviceDuration);
+			$slot->addMinutes($slotDiscreteTime);
+			$endSlot->addMinutes($slotDiscreteTime);
 		}
 		return $availableSlots;
 	}
