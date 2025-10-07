@@ -2,18 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAppointmentRequest;
-use App\Http\Requests\UpdateAppointmentRequest;
 use App\Models\Appointment;
+use App\Models\Service;
+use App\Models\Specialist;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class AppointmentController extends Controller
 {
+	//protected AppointmentService $apService;
+	//public function __construct(AppointmentService $as){
+	//	$this->apService = $as;
+	//}
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        //
+	    $user = $request->user();
+	    $appoints = Appointment::where('user_id',$user->id)
+		    ->with(['specialist','service'])
+		    ->orderBy('start_datetime','desc')
+		    ->get();
+	    return response()->json(['appointments'=>$appoints]);
     }
 
     /**
@@ -21,15 +32,59 @@ class AppointmentController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAppointmentRequest $request)
+    public function store(Request $request)
     {
-        //
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'specialist_id' => 'required|integer|exists:specialists,id',
+            'service_id' => 'required|integer|exists:services,id',
+            'start_datetime' => 'required|date|date_format:Y-m-d H:i:s|after:now',
+            //'client_phone' => 'nullable|string|max:20',
+            //'notes' => 'nullable|string|max:500',
+	]);
+	$service = Service::find()
+	$st = Carbon::parse($validated['start_datetime']);
+	$et->addMinuts(duration);
+
+        $slots = $this->slotService->getAvailableSlots(
+            $validated['specialist_id'],
+            $date,
+            $service->duration_minutes
+	);
+	if!($slots->contains(st))
+		return response()-> json([
+		message => "this slot is not in the availables!"
+		],422);
+
+        // Create appointment
+        $appointment = Appointment::create([
+            'user_id' => $user->id,
+            'specialist_id' => $validated['specialist_id'],
+            'service_id' => $validated['service_id'],
+            'start_datetime' => $validated['start_datetime'],
+            'end_datetime' => $et->format('Y-m-d H:i:s'),
+            //'client_name' => $user->username,
+            //'client_email' => $user->email,
+            //'client_phone' => $validated['client_phone'] ?? null,
+            //'notes' => $validated['notes'] ?? null,
+            //'status' => 'confirmed',
+        ]);
+
+        // Clear cache
+        //$this->slotService->clearCache($validated['specialist_id'], $date);
+
+        // Load relationships
+        $appointmentWithServiceAndSpecialist->load(['specialist', 'service']);
+
+        return response()->json([
+            'message' => 'Appointment booked successfully',
+            'appointment' => $appointmentWithServiceAndSpecialist,]);
     }
 
     /**

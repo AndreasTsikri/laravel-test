@@ -17,3 +17,18 @@ exit
 App\Models\Service::All()
 :1
 q
+Str::random(3)
+Str::random(15)
+exit
+ls
+clear
+App\Models\User::All
+App\Models\User::All()
+exit
+Schema::getColumnListing('users'); // returns array of column names
+Schema::getColumnListing('users');
+exit
+Schema::getColumnListing('users');
+exit
+Schema::getColumnListing('users');
+exit
