@@ -48,9 +48,9 @@ class AppointmentController extends Controller
             //'client_phone' => 'nullable|string|max:20',
             //'notes' => 'nullable|string|max:500',
 	]);
-	$service = Service::find()
+	$service = Service::find(validated['service_id']);
 	$st = Carbon::parse($validated['start_datetime']);
-	$et->addMinuts(duration);
+	$et = st->copy()->addMinuts($service->duration);
 
         $slots = $this->slotService->getAvailableSlots(
             $validated['specialist_id'],

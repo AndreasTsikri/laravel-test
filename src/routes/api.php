@@ -18,7 +18,7 @@ use App\Http\Controllers\AppointmentController;
 //Route::delete('/appointments/{appointment}',[AppointmentController::class,'destroy'];
 
 //register user to db and creates a random token
-Route::post('/register',[AuthController::class,'register']);
+Route::post('/register',[AuthController::class,'register'])->withoutMiddleware([AuthenticateBearerToken::class]);
 
 Route::get('/slots',[SlotsController::class,'index'] );
 
