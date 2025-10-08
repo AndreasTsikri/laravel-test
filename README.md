@@ -27,26 +27,30 @@ cd your-repo
 
 Before starting the containers, ensure your database schema is created. You can run migrations directly from Docker after the containers are up.
 ```bash
-docker-compose run --rm app php artisan migrate
+docker-compose run --rm php-cli  php artisan migrate
 ```
-### 3.3. Build Docker Containers
+### 3 Build Docker Containers
 
 Build your Docker environment with:
-
+```bash
 docker-compose build
-
+```
 ### 4. Start Docker Containers
 
 Run the containers in detached mode:
 ```bash
 docker-compose up -d
 ```
-
+(*Important: You can build and run docker compose in one step by using 
+```bash
+docker-compose up -d --build
+```)
 This will start:
 
-The Laravel application
+The Laravel application (as all indepentent containers like nginx and php-fpm running!)
 
 The database (MySQL/PostgreSQL, depending on your Dockerfile setup). Here i have all the details inside the cloned dockerfile!
+
 
 ### 5. Access the Application
 
@@ -84,8 +88,8 @@ Response:
   "bearer token": "random_generated_token"
 }
 
-Example: Login (if implemented)
-curl -X POST http://localhost:8080/api/login \
+Example: Register (to get a bearer token!)
+curl -X POST http://localhost:8080/api/register \
      -H "Content-Type: application/json" \
      -d '{"username":"john"}'
 
@@ -102,6 +106,15 @@ Response:
 docker-compose down 
 ```
 
+### 7.visit API routes
+
+For slots you must provide specialistId(1,2,...) and service('maniqure')
+
+To CREATE an appointment 1) register to get bearer token 2)see slots through slots route 3)call POST on  appointments/store URL and  specicfy service id, specialist id and starting datetime of slot on the create route!
+
+To CANCEL an appointment call DELETE on appointments/id URL  with the appointment id to delete!
+
+
 ## Notes
 
 The simpleBearerToken is stored NOT hashed in the database. Always return the plain token to the user when registering or logging in.
@@ -110,7 +123,9 @@ API routes are defined in routes/api.php.
 
 All migrations and seeding are handled via Laravel artisan commands inside the php-cli Docker container.
 
-Recommended Workflow
+Dont forget to include the Bearer token on the url calls!
+
+## Recommended Workflow
 
 Clone repo → cd into project
 
@@ -118,7 +133,7 @@ Build Docker → docker-compose build
 
 Start containers → docker-compose up -d
 
-Run migrations → docker-compose run --rm app php artisan migrate:fresh --seed
+Run migrations → docker-compose run --rm php-cli php artisan migrate:fresh --seed
 
 Test API via curl or Postman
 
