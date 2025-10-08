@@ -118,13 +118,36 @@ class AppointmentController extends Controller
      */
     public function update(UpdateAppointmentRequest $request, Appointment $appointment)
     {
-        //
+        $validated = $request->validate([
+		'appointment_id' => 'required|integer|exists:appoimtments,id'];
+	$app = Appointment::find(validated['appointment_id'];
+	if($app == null){
+
+		return json(
+			['message'=> 'Appointment does not exist, please specify correct appointment_id'],404
+		);
+	}
+	if($app->user_id !== $req->user->id){
+		return response()->json([
+                'message' => 'Unauthorized. You can only cancel your own appointments.'
+            ], 403);
+	}
+	// Store details for cache clearing
+       // $specialistId = $appointmentModel->specialist_id;
+       // $date = $appointmentStart->format('Y-m-d');
+
+	$app->delete();
+	//clear cache
+	//this->slotService->clearCache($specialistId,$date);
+	return response()->json([
+		'message'=> 'Appointment cancelled successfully!'
+	],200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Appointment $appointment)
+    public function destroy(Request $req)
     {
         //
     }
