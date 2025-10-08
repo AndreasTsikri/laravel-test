@@ -9,7 +9,7 @@ class Appointment extends Model
 {
     /** @use HasFactory<\Database\Factories\AppointmentFactory> */
     use HasFactory;
-    protected $fillable = ['specialist_id', 'service_id', 'booked_at'];
+    protected $fillable = ['user_id','specialist_id', 'service_id', 'start_datetime','end_datetime'];
 //    public static DateTime $startDateTime = new DateTime('09:00:00');
 //    public static DateTime $endDateTime = new DateTime('18:00:00');
 //    public static $slots = [];
@@ -38,5 +38,9 @@ class Appointment extends Model
     public function services() : BelongsTo
     {
 	    return $this->belongsTo(Service::class);
+    }
+    public function users() : BelongsTo
+    {
+	    return $this->belongsTo(User::class);
     }
 }

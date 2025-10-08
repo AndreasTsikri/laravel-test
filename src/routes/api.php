@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SlotsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AppointmentController;
-
+use App\Http\Middleware\AuthenticateBearerToken;
 //Route::get('/slots', [SlotsController:class,'getAvailableSlots']);
 //Route::get('/slots/{tid}',function(string $tid){return "works OK as well with {$tid}!!";} );
 //Route::resource('/slots/specialist/{specialistId}/date/{date}',[SlotsController::class,'getAvailableSlots'] );
@@ -23,6 +23,6 @@ Route::post('/register',[AuthController::class,'register'])->withoutMiddleware([
 Route::get('/slots',[SlotsController::class,'index'] );
 
 Route::controller(AppointmentController::class)->group(function(){
-	Route::post('/appointments/{appointment}','store');
-	Route::delete('/appointments/{appointment}','destroy');
+	Route::post('/appointments/','store');
+	Route::delete('/appointments/','destroy');
 });//->middleware("customAuthenticated");

@@ -32,3 +32,13 @@ Schema::getColumnListing('users');
 exit
 Schema::getColumnListing('users');
 exit
+App\Models\User::All();
+:q
+exit
+clear
+App\Models\Service::All()
+App\Models\Services::All()
+App\Models\Specialist::All()
+App\Models\Services::All()
+App\Models\Service::All()
+exit

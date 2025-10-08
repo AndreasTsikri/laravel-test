@@ -5,14 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\Specialist;
+use App\Services\SlotsService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-
+use Carbon\Carbon;
 class AppointmentController extends Controller
 {
 	//protected AppointmentService $apService;
 	//public function __construct(AppointmentService $as){
 	//	$this->apService = $as;
+	//}
+	//protected SlotsService $slotsService;
+	//public function __construct(SlotsService $ss){
+	//	$this->slotsService = $ss;
 	//}
     /**
      * Display a listing of the resource.
@@ -37,30 +42,35 @@ class AppointmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request,SlotsService $slotsService)
     {
         $user = $request->user();
-
         $validated = $request->validate([
             'specialist_id' => 'required|integer|exists:specialists,id',
             'service_id' => 'required|integer|exists:services,id',
-            'start_datetime' => 'required|date|date_format:Y-m-d H:i:s|after:now',
+            'start_datetime' => 'required|date|date_format:Y-m-d H:i:s|after:now'
             //'client_phone' => 'nullable|string|max:20',
             //'notes' => 'nullable|string|max:500',
 	]);
-	$service = Service::find(validated['service_id']);
-	$st = Carbon::parse($validated['start_datetime']);
-	$et = st->copy()->addMinuts($service->duration);
+	$service = Service::find($validated['service_id']);
 
-        $slots = $this->slotService->getAvailableSlots(
+        $slots = $slotsService->getAvailableSlots(
             $validated['specialist_id'],
-            $date,
-            $service->duration_minutes
+            $validated['start_datetime'],
+	    $service->duration,
+	    true  
 	);
-	if!($slots->contains(st))
+
+	$st = Carbon::parse($validated['start_datetime']);
+	if(!in_array($st->toTimeString('minute'),$slots)){
+		$strSlots = json_encode($slots);
 		return response()-> json([
-		message => "this slot is not in the availables!"
+		'message' => "this slot is not in the availables!",
+		'available slots' => $strSlots,
+		'service duration' => $service->duration,
 		],422);
+	}
+	$et = $st->copy()->addMinutes($service->duration);
 
         // Create appointment
         $appointment = Appointment::create([
@@ -80,11 +90,11 @@ class AppointmentController extends Controller
         //$this->slotService->clearCache($validated['specialist_id'], $date);
 
         // Load relationships
-        $appointmentWithServiceAndSpecialist->load(['specialist', 'service']);
+        //$appointment->load(['specialist', 'service']);
 
         return response()->json([
             'message' => 'Appointment booked successfully',
-            'appointment' => $appointmentWithServiceAndSpecialist,]);
+            'appointment' => $appointment,]);
     }
 
     /**

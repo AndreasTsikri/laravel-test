@@ -15,6 +15,9 @@ class Service extends Model
 	public function specialists()
 	{
 		return $this->belongsToMany(Specialist::class);
-
+	}
+	public function appointments() : HasMany
+	{
+		return $this->hasMany(Appointment::class);
 	}
 }

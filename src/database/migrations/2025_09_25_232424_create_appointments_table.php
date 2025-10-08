@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('service_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('specialist_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('client_name');
+            $table->string('client_name')->nullable();
             $table->dateTime('start_datetime');
             $table->dateTime('end_datetime');
 	    $table->index(['specialist_id','start_datetime']);

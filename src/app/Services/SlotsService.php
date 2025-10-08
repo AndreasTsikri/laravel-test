@@ -10,11 +10,11 @@ class SlotsService{
 	//	$this->$specialistId = $specialistId;
 	//}
 
-	public function getAvailableSlots($specialistId,$date,$slotsDuration) : ?array{
+	public function getAvailableSlots($specialistId,$date,$slotsDuration,$hasTime = false) : ?array{
 
 		if(!Specialist::where('id',$specialistId)->exists())
 			return null;
-		return $this->getAvSlots($specialistId,$date,$slotsDuration);
+		return $this->getAvSlots($specialistId,$date,$slotsDuration,$hasTime);
 	}
 	public function getAvailableSlots_2($specialistId,$date,$serviceName) : ?array{
 
@@ -30,7 +30,7 @@ class SlotsService{
 		return $this->getAvSlots($specialistId,$date,$spec->services->first()->duration);
 	}
 
-	public function getAvSlots($specialistId,$date,$serviceDuration) : array
+	public function getAvSlots($specialistId,$date,$serviceDuration,$hasTime = false) : array
 	{
 		//define local functions
 		$areOverlap = function ($start1,$end1,$start2,$end2){
@@ -40,8 +40,11 @@ class SlotsService{
 				return true;
 		};
 		//Get Specialist working hours
-		$startWorkDt = Carbon::parse($date . '09:00:00');
-		$endWorkDt   = Carbon::parse($date . '18:00:00');
+		$dtStr = $hasTime ? substr($date,0,10): $date;//format Y-m-d
+		$strDtS       = $dtStr .' 09:00:00';
+		$strDtE       = $dtStr .' 18:00:00';
+		$startWorkDt = Carbon::parse($strDtS);
+		$endWorkDt   = Carbon::parse($strDtE);
 		//Get Specialist appointments
 		$appointments = Appointment::where('specialist_id',$specialistId)
 			//->whereDate('start_datetime',$date)
@@ -50,9 +53,9 @@ class SlotsService{
 		//Start searching all slots in a pace of 5 mins
 		//So next_dt = prev_dt + 5 mins_dt for all times until next_dt > end_working_dt
 		//check if (next_dt + serviceDuration) overlaps with appointment, if not insert it to the availableSlots array! 
-		$slot = $startWorkDt->copy();
+		$slot    = $startWorkDt->copy();
 		$endSlot = $startWorkDt->copy()->addMinutes($serviceDuration);
-		$availableSlots = [];
+		$availableSlots[] = $slot->format('H:i');
 		$slotDiscreteTime = 5;//the disretization of the slots -> we seperate in 5 mins slots!
 		while($endSlot <= $endWorkDt)
 		{
